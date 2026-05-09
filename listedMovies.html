@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>All Movies — CinemaX</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet" />
+
+    <style>
+        /* ── TOKENS ─────────────────────────────── */
+        :root {
+            --red: #e50914;
+            --red-dim: #9b0610;
+            --red-glow: rgba(229,9,20,.18);
+            --maroon: #5c0000;
+            --gold: #f5c518;
+            --bg: #0b0b0e;
+            --bg2: #111116;
+            --bg3: #18181f;
+            --card: #141419;
+            --text: #f0eff4;
+            --muted: #7a7990;
+            --border: rgba(255,255,255,.07);
+            --radius: 10px;
+            --head: 'Bebas Neue', sans-serif;
+            --body: 'Barlow', sans-serif;
+            --cond: 'Barlow Condensed', sans-serif;
+        }
+
+        /* ── BASE ───────────────────────────────── */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--body);
+            overflow-x: hidden;
+        }
+
+        img {
+            display: block;
+            max-width: 100%;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--red);
+            border-radius: 3px;
+        }
+
+        /* ── NAVBAR ─────────────────────────────── */
+        .cx-nav {
+            position: sticky;
+            top: 0;
+            z-index: 900;
+            background: var(--maroon);
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,.08);
+            backdrop-filter: blur(8px);
+        }
+
+            .cx-nav .container {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+        .cx-brand {
+            font-family: var(--head);
+            font-size: 1.9rem;
+            letter-spacing: 3px;
+        }
+
+            .cx-brand span {
+                color: var(--red);
+            }
+
+        .cx-links {
+            display: flex;
+            gap: 6px;
+            list-style: none;
+        }
+
+            .cx-links a {
+                font-size: .8rem;
+                font-weight: 600;
+                letter-spacing: .7px;
+                text-transform: uppercase;
+                color: rgba(255,255,255,.75);
+                padding: 7px 14px;
+                border-radius: 20px;
+                transition: .2s;
+            }
+
+                .cx-links a:hover, .cx-links a.active {
+                    color: #fff;
+                    background: rgba(255,255,255,.1);
+                }
+
+        .btn-booknow {
+            background: var(--red);
+            color: #fff !important;
+            border-radius: 20px !important;
+            padding: 7px 20px !important;
+            font-weight: 700 !important;
+            font-size: .8rem !important;
+            letter-spacing: .5px;
+            transition: .2s;
+        }
+
+            .btn-booknow:hover {
+                background: var(--red-dim);
+                transform: translateY(-1px);
+            }
+
+        /* ── PAGE HEADER ────────────────────────── */
+        .page-header {
+            background: linear-gradient(135deg, #0b0b0e 0%, #1a0000 50%, #0b0b0e 100%);
+            padding: 60px 0 50px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid var(--border);
+        }
+
+            .page-header::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: radial-gradient(ellipse 70% 70% at 50% 100%, rgba(229,9,20,.12) 0%, transparent 65%);
+                pointer-events: none;
+            }
+
+            .page-header h1 {
+                font-family: var(--head);
+                font-size: clamp(2.8rem,6vw,5rem);
+                letter-spacing: 4px;
+                line-height: 1;
+                margin-bottom: 10px;
+            }
+
+                .page-header h1 span {
+                    color: var(--red);
+                }
+
+            .page-header p {
+                color: var(--muted);
+                font-size: .95rem;
+                max-width: 480px;
+                margin: 0 auto 28px;
+            }
+
+        /* Search + filter bar */
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            max-width: 780px;
+            margin: 0 auto;
+        }
+
+        .search-wrap {
+            position: relative;
+            flex: 1;
+            min-width: 220px;
+            max-width: 340px;
+        }
+
+            .search-wrap i {
+                position: absolute;
+                left: 14px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--muted);
+                font-size: .85rem;
+            }
+
+            .search-wrap input {
+                width: 100%;
+                background: rgba(255,255,255,.07);
+                border: 1px solid var(--border);
+                color: var(--text);
+                padding: 10px 14px 10px 38px;
+                border-radius: 24px;
+                font-family: var(--body);
+                font-size: .87rem;
+                outline: none;
+                transition: .2s;
+            }
+
+                .search-wrap input:focus {
+                    border-color: rgba(229,9,20,.5);
+                    background: rgba(255,255,255,.1);
+                }
+
+                .search-wrap input::placeholder {
+                    color: var(--muted);
+                }
+
+        .sort-select {
+            background: rgba(255,255,255,.07);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 10px 16px;
+            border-radius: 24px;
+            font-family: var(--body);
+            font-size: .87rem;
+            outline: none;
+            cursor: pointer;
+        }
+
+            .sort-select option {
+                background: var(--bg2);
+            }
+
+        /* ── GENRE PILLS ─────────────────────────── */
+        .genre-pills-wrap {
+            background: var(--bg2);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 0;
+            position: sticky;
+            top: 61px;
+            z-index: 800;
+        }
+
+        .genre-pills {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 0 24px;
+            scrollbar-width: none;
+        }
+
+            .genre-pills::-webkit-scrollbar {
+                display: none;
+            }
+
+        .gpill {
+            flex-shrink: 0;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: .78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            cursor: pointer;
+            transition: .2s;
+            font-family: var(--body);
+        }
+
+            .gpill:hover {
+                border-color: rgba(229,9,20,.5);
+                color: var(--text);
+            }
+
+            .gpill.active {
+                background: var(--red);
+                border-color: var(--red);
+                color: #fff;
+            }
+
+        /* ── MAIN LAYOUT ─────────────────────────── */
+        .main-wrap {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 40px 24px 80px;
+        }
+
+        /* ── GENRE SECTION ───────────────────────── */
+        .genre-section {
+            margin-bottom: 56px;
+        }
+
+            .genre-section.hidden {
+                display: none;
+            }
+
+        .genre-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 22px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+            .genre-header .genre-icon {
+                font-size: 1.3rem;
+            }
+
+            .genre-header h2 {
+                font-family: var(--head);
+                font-size: 1.9rem;
+                letter-spacing: 3px;
+                color: var(--text);
+                margin: 0;
+            }
+
+                .genre-header h2 span {
+                    color: var(--red);
+                }
+
+        .genre-count {
+            margin-left: auto;
+            background: rgba(229,9,20,.12);
+            border: 1px solid rgba(229,9,20,.2);
+            color: var(--red);
+            font-size: .72rem;
+            font-weight: 700;
+            padding: 3px 12px;
+            border-radius: 12px;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+        }
+
+        /* ── MOVIE GRID ──────────────────────────── */
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+            gap: 18px;
+        }
+
+        /* ── MOVIE CARD ──────────────────────────── */
+        .mc {
+            background: var(--card);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: transform .28s ease, box-shadow .28s ease, border-color .28s ease;
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+            .mc:hover {
+                transform: translateY(-8px) scale(1.02);
+                border-color: rgba(229,9,20,.4);
+                box-shadow: 0 20px 48px rgba(0,0,0,.6), 0 0 0 1px rgba(229,9,20,.15);
+            }
+
+                .mc:hover .mc-overlay {
+                    opacity: 1;
+                }
+
+                .mc:hover .mc-poster img {
+                    transform: scale(1.06);
+                }
+
+        /* Poster */
+        .mc-poster {
+            position: relative;
+            aspect-ratio: 2/3;
+            overflow: hidden;
+            background: #0d0d10;
+            flex-shrink: 0;
+        }
+
+            .mc-poster img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform .5s ease;
+            }
+
+        /* Badges */
+        .mc-badge {
+            position: absolute;
+            top: 9px;
+            left: 9px;
+            z-index: 2;
+            font-family: var(--cond);
+            font-size: .65rem;
+            font-weight: 700;
+            letter-spacing: .8px;
+            text-transform: uppercase;
+            padding: 3px 9px;
+            border-radius: 6px;
+        }
+
+        .badge-new {
+            background: var(--red);
+            color: #fff;
+        }
+
+        .badge-vip {
+            background: var(--gold);
+            color: #000;
+            top: 34px;
+        }
+
+        .mc-rating {
+            position: absolute;
+            top: 9px;
+            right: 9px;
+            z-index: 2;
+            background: rgba(0,0,0,.75);
+            backdrop-filter: blur(4px);
+            padding: 3px 9px;
+            border-radius: 7px;
+            font-size: .72rem;
+            font-weight: 700;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        /* Overlay on hover */
+        .mc-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 3;
+            background: linear-gradient(to top, rgba(0,0,0,.95) 0%, rgba(0,0,0,.4) 55%, transparent 100%);
+            opacity: 0;
+            transition: opacity .28s;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 14px;
+        }
+
+            .mc-overlay .ov-title {
+                font-family: var(--cond);
+                font-size: 1rem;
+                font-weight: 700;
+                letter-spacing: .5px;
+                margin-bottom: 6px;
+                line-height: 1.2;
+            }
+
+            .mc-overlay .ov-desc {
+                font-size: .72rem;
+                color: rgba(255,255,255,.72);
+                line-height: 1.55;
+                margin-bottom: 10px;
+                display: -webkit-box;
+                -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+            .mc-overlay .ov-actions {
+                display: flex;
+                gap: 7px;
+            }
+
+        .ov-book {
+            flex: 1;
+            background: var(--red);
+            color: #fff;
+            border: none;
+            padding: 7px;
+            border-radius: 7px;
+            font-size: .76rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: .2s;
+            font-family: var(--body);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+            .ov-book:hover {
+                background: var(--red-dim);
+            }
+
+        .ov-trailer {
+            background: rgba(255,255,255,.15);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,.25);
+            padding: 7px 12px;
+            border-radius: 7px;
+            font-size: .76rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .2s;
+            font-family: var(--body);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+            .ov-trailer:hover {
+                background: rgba(255,255,255,.25);
+            }
+
+        /* Card body (below poster) */
+        .mc-body {
+            padding: 12px 12px 8px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mc-title {
+            font-family: var(--cond);
+            font-size: .95rem;
+            font-weight: 700;
+            letter-spacing: .3px;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .mc-genre {
+            font-size: .68rem;
+            color: var(--muted);
+            margin-bottom: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .mc-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: .72rem;
+            color: var(--muted);
+            margin-top: auto;
+        }
+
+            .mc-meta .dot {
+                width: 3px;
+                height: 3px;
+                background: var(--muted);
+                border-radius: 50%;
+            }
+
+        /* Card footer */
+        .mc-footer {
+            padding: 9px 12px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mc-price {
+            font-family: var(--cond);
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--red);
+        }
+
+        .mc-bookbtn {
+            background: var(--red);
+            color: #fff;
+            border: none;
+            padding: 5px 14px;
+            border-radius: 7px;
+            font-size: .75rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: .2s;
+            font-family: var(--body);
+        }
+
+            .mc-bookbtn:hover {
+                background: var(--red-dim);
+            }
+
+        /* ── NO RESULTS ──────────────────────────── */
+        .no-results {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--muted);
+        }
+
+            .no-results i {
+                font-size: 3rem;
+                margin-bottom: 16px;
+                color: rgba(229,9,20,.3);
+            }
+
+            .no-results h3 {
+                font-family: var(--head);
+                font-size: 2rem;
+                letter-spacing: 2px;
+                margin-bottom: 8px;
+            }
+
+        /* ── STATS BAR ───────────────────────────── */
+        .stats-bar {
+            display: flex;
+            gap: 0;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin-bottom: 36px;
+        }
+
+        .stat {
+            flex: 1;
+            text-align: center;
+            padding: 18px 12px;
+            border-right: 1px solid var(--border);
+        }
+
+            .stat:last-child {
+                border-right: none;
+            }
+
+        .stat-n {
+            font-family: var(--head);
+            font-size: 1.8rem;
+            color: var(--red);
+            letter-spacing: 1px;
+            line-height: 1;
+        }
+
+        .stat-l {
+            font-size: .68rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 3px;
+        }
+
+        /* ── FOOTER ──────────────────────────────── */
+        .cx-footer {
+            background: #000;
+            border-top: 1px solid var(--border);
+            padding: 40px 0 20px;
+            text-align: center;
+        }
+
+            .cx-footer .brand {
+                font-family: var(--head);
+                font-size: 1.6rem;
+                letter-spacing: 3px;
+                margin-bottom: 6px;
+            }
+
+                .cx-footer .brand span {
+                    color: var(--red);
+                }
+
+            .cx-footer p {
+                color: var(--muted);
+                font-size: .8rem;
+            }
+
+            .cx-footer .socials {
+                display: flex;
+                gap: 12px;
+                justify-content: center;
+                margin: 14px 0;
+            }
+
+                .cx-footer .socials a {
+                    color: var(--muted);
+                    font-size: 1rem;
+                    transition: .2s;
+                }
+
+                    .cx-footer .socials a:hover {
+                        color: var(--red);
+                    }
+
+        /* ── BACK TO TOP ─────────────────────────── */
+        .btt {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            z-index: 500;
+            background: var(--red);
+            color: #fff;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            font-size: .95rem;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transition: .3s;
+            box-shadow: 0 4px 16px rgba(229,9,20,.4);
+        }
+
+            .btt.show {
+                opacity: 1;
+                pointer-events: all;
+            }
+
+            .btt:hover {
+                transform: translateY(-3px);
+            }
+
+        /* ── RESPONSIVE ──────────────────────────── */
+        @media (max-width: 768px) {
+            .cx-links, .btn-booknow {
+                display: none;
+            }
+
+            .movie-grid {
+                grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+                gap: 12px;
+            }
+
+            .stats-bar {
+                flex-wrap: wrap;
+            }
+
+            .stat {
+                min-width: 50%;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+                .stat:last-child {
+                    border-bottom: none;
+                }
+        }
+
+        @media (max-width: 480px) {
+            .movie-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ── NAVBAR ──────────────────────────────── -->
+    <nav class="cx-nav">
+        <div class="container">
+            <a href="index.html" class="cx-brand">CINEMA<span>X</span></a>
+            <ul class="cx-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="booking.html">Booking</a></li>
+                <li><a href="listedMovies.html" class="active">Movies</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <a href="booking.html" class="cx-links btn-booknow" style="color:#fff;">Book Now</a>
+        </div>
+    </nav>
+
+    <!-- ── PAGE HEADER ──────────────────────────── -->
+    <div class="page-header">
+        <h1>ALL <span>MOVIES</span></h1>
+        <p>Browse our full library — grouped by genre, sorted your way.</p>
+        <div class="filter-bar">
+            <div class="search-wrap">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="searchInput" placeholder="Search movies…" oninput="applyFilters()">
+            </div>
+            <select class="sort-select" id="sortSelect" onchange="applyFilters()">
+                <option value="default">Sort: Default</option>
+                <option value="rating">Highest Rated</option>
+                <option value="name">A – Z</option>
+                <option value="duration">Longest First</option>
+                <option value="price-low">Price: Low</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- ── GENRE PILLS ──────────────────────────── -->
+    <div class="genre-pills-wrap">
+        <div class="genre-pills" id="genrePills">
+            <button class="gpill active" onclick="filterGenre('All',this)">All Genres</button>
+            <button class="gpill" onclick="filterGenre('Sci-Fi',this)">🚀 Sci-Fi</button>
+            <button class="gpill" onclick="filterGenre('Action',this)">⚔️ Action</button>
+            <button class="gpill" onclick="filterGenre('Drama',this)">🎭 Drama</button>
+            <button class="gpill" onclick="filterGenre('Crime',this)">🕵️ Crime</button>
+            <button class="gpill" onclick="filterGenre('Comedy',this)">😂 Comedy</button>
+            <button class="gpill" onclick="filterGenre('Anime',this)">⛩️ Anime</button>
+            <button class="gpill" onclick="filterGenre('Horror',this)">👻 Horror</button>
+            <button class="gpill" onclick="filterGenre('Romance',this)">❤️ Romance</button>
+            <button class="gpill" onclick="filterGenre('Thriller',this)">🔪 Thriller</button>
+            <button class="gpill" onclick="filterGenre('Adventure',this)">🗺️ Adventure</button>
+            <button class="gpill" onclick="filterGenre('War',this)">🪖 War</button>
+            <button class="gpill" onclick="filterGenre('Biography',this)">📖 Biography</button>
+        </div>
+    </div>
+
+    <!-- ── MAIN ─────────────────────────────────── -->
+    <div class="main-wrap">
+
+        <!-- Stats -->
+        <div class="stats-bar" id="statsBar">
+            <div class="stat"><div class="stat-n" id="statTotal">0</div><div class="stat-l">Total Movies</div></div>
+            <div class="stat"><div class="stat-n" id="statGenres">0</div><div class="stat-l">Genres</div></div>
+            <div class="stat"><div class="stat-n">R90</div><div class="stat-l">From</div></div>
+            <div class="stat"><div class="stat-n">6</div><div class="stat-l">Daily Showtimes</div></div>
+        </div>
+
+        <!-- Genre sections rendered by JS -->
+        <div id="movieSections"></div>
+        <div class="no-results" id="noResults" style="display:none;">
+            <i class="fa-solid fa-film"></i>
+            <h3>NO MOVIES FOUND</h3>
+            <p>Try a different search or genre filter.</p>
+        </div>
+
+    </div>
+
+    <!-- ── FOOTER ───────────────────────────────── -->
+    <footer class="cx-footer">
+        <div class="cx-brand">CINEMA<span>X</span></div>
+        <div class="socials">
+            <a href="https://facebook.com" target="_blank"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="https://instagram.com" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+            <a href="https://twitter.com" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
+        </div>
+        <p>© 2026 CinemaX | Built by Moroana Machoene Karel</p>
+    </footer>
+
+    <button class="btt" id="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+        <i class="fa-solid fa-chevron-up"></i>
+    </button>
+
+    <!-- ── DATA ─────────────────────────────────── -->
+    <script>
+// ══════════════════════════════════════════════
+//  ALL MOVIES — add as many as you want here
+//  poster: put your image in images/ folder
+// ══════════════════════════════════════════════
+const ALL_MOVIES = [
+
+  /* ── SCI-FI ───────────────────────────────── */
+  {
+    id:1, title:"Dune: Part Two", genre:"Sci-Fi",
+    tags:["Sci-Fi","Action","Adventure","Drama"],
+    rating:8.7, duration:"2h 46m", price:"R90",
+    poster:"images/dune 2-picture.png",
+    desc:"Paul Atreides unites with Chani and the Fremen while seeking revenge against the conspirators who destroyed his family. Facing a choice between the love of his life and the fate of the universe, he must prevent a terrible future only he can foresee.",
+    isNew:true, isVip:false
+  },
+  {
+    id:2, title:"Interstellar", genre:"Sci-Fi",
+    tags:["Sci-Fi","Drama","Adventure"],
+    rating:9.0, duration:"2h 49m", price:"R90",
+    poster:"images/Interstellar.png",
+    desc:"In a dystopian future where Earth has become near-uninhabitable, a team of astronauts embark on a mission through a wormhole to find a new home for humanity.",
+    isNew:false, isVip:false
+  },
+  {
+    id:3, title:"Blade Runner 2049", genre:"Sci-Fi",
+    tags:["Sci-Fi","Drama","Thriller"],
+    rating:8.0, duration:"2h 44m", price:"R90",
+    poster:"https://image.tmdb.org/t/p/w500/gajva2L0rPYkEWjzgFlBXCAVBE5.jpg",
+    desc:"A young blade runner discovers a long-buried secret that has the potential to plunge what's left of society into chaos. His discovery leads him on a quest to find Rick Deckard, a former blade runner who's been missing for decades.",
+    isNew:false, isVip:false
+  },
+  {
+    id:4, title:"The Matrix", genre:"Sci-Fi",
+    tags:["Sci-Fi","Action","Thriller"],
+    rating:8.7, duration:"2h 16m", price:"R90",
+    poster:"https://image.tmdb.org/t/p/w500/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg",
+    desc:"A computer hacker learns from mysterious rebels about the true nature of his reality and his role in the war against its controllers.",
+    isNew:false, isVip:false
+  },
+
+  /* ── ACTION ───────────────────────────────── */
+  {
+    id:5, title:"John Wick: Chapter 4", genre:"Action",
+    tags:["Action","Crime","Thriller"],
+    rating:7.6, duration:"2h 49m", price:"R90",
+    poster:"images/JohnWick4.jpg",
+    desc:"With the price on his head ever-increasing, legendary hit man John Wick takes his fight against the High Table global — from New York to Paris to Japan to Berlin.",
+    isNew:false, isVip:true
+  },
+  {
+    id:6, title:"Mission: Impossible – Final Reckoning", genre:"Action",
+    tags:["Action","Adventure","Thriller"],
+    rating:7.1, duration:"2h 49m", price:"R90",
+    poster:"images/Mission Impossible.png",
+    desc:"Hunt and the IMF pursue a dangerous AI called the Entity that has infiltrated global intelligence. With governments and a figure from his past in pursuit, Hunt races to stop it.",
+    isNew:true, isVip:false
+  },
+  {
+    id:7, title:"Mad Max: Fury Road", genre:"Action",
+    tags:["Action","Adventure","Sci-Fi"],
+    rating:8.1, duration:"2h 0m", price:"R90",
+    poster:"https://image.tmdb.org/t/p/w500/kqjL17yufvn9OVLyXYpvtyrFfak.jpg",
+    desc:"In a post-apocalyptic wasteland, a woman rebels against a tyrannical ruler in search of her homeland with the aid of a group of female prisoners, a psychotic worshiper, and a drifter named Max.",
+    isNew:false, isVip:false
+  },
+  {
+    id:8, title:"Top Gun: Maverick", genre:"Action",
+    tags:["Action","Drama"],
+    rating:8.3, duration:"2h 11m", price:"R90",
+    poster:"https://image.tmdb.org/t/p/w500/62HCnUTziyWcpDaBO2i1DX17ljH.jpg",
+    desc:"After more than thirty years of service as a top naval aviator, Pete 'Maverick' Mitchell is where he belongs, pushing the envelope as a courageous test pilot.",
+    isNew:false, isVip:true
+  },
+  {
+    id:9, title:"Gladiator II", genre:"Action",
+    tags:["Action","Adventure","Drama"],
+    rating:7.2, duration:"2h 28m", price:"R90",
+    poster:"https://image.tmdb.org/t/p/w500/2cxhvwyEwRlysAmRH4iodkvo0z5.jpg",
+    desc:"Lucius, the son of Lucilla, is forced to enter the Colosseum after his home is conquered by the tyrannical emperors who now lead Rome.",
+    isNew:true, isVip:false
+  },
+
+  /* ── DRAMA ────────────────────────────────── */
+  {
+    id:10, title:"The Shawshank Redemption", genre:"Drama",
+    tags:["Drama","Crime"],
+    rating:9.3, duration:"2h 22m", price:"R90",
+    poster:"https://image.tmdb.org/t/p/w500/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg",
+    desc:"Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.",
+    isNew:false, isVip:false
+  },
+  {
+    id:11, title:"Forrest Gump", genre:"Drama",
+    tags:["Drama","Romance","Comedy"],
+    rating:8.8, duration:"2h 22m", price:"R90",
+    poster:"https://image.tmdb.org/t/p/w500/arw2vcBveWOVZr6pxd9XTd1TdQa.jpg",
+    desc:"The presidencies of Kennedy and Johnson, the events of Vietnam, Watergate, and other historical events unfold through the perspective of an Alabama man with an IQ of 75.",
+    isNew:false, isVip:false
+  },
+  {
+    id:12, title:"Oppenheimer", genre:"Drama",
+    tags:["Drama","Biography","History"],
+    rating:8.3, duration:"3h 0m", price:"R90",
+    poster:"https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg",
+    desc:"The story of American scientist J. Robert Oppenheimer and his role in the development of the atomic bomb during World War II.",
+    isNew:false, isVip:true
+  },
+  {
+    id:13, title:"Joker", genre:"Drama",
+    tags:["Drama","Crime","Thriller"],
+    rating:8.4, duration:"2h 2m", price:"R90",
+    poster:"https://image.tmdb.org/t/p/w500/udDclJoHjfjb8Ekgsd4FDteOkCU.jpg",
+    desc:"In Gotham City, mentally troubled comedian Arthur Fleck embarks on a downward spiral of social revolution and bloody crime. This path brings him face-to-face with his alter-ego: the Joker.",
+    isNew:false, isVip:false
+  },
+
+  /* ── CRIME ────────────────────────────────── */
+  {
+    id:14, title:"The Godfather", genre:"Crime",
+    tags:["Crime","Drama"],
+    rating:9.2, duration:"2h 55m", price:"R90",
+    poster:"images/The GodFather.png",
+    desc:"The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son.",
+    isNew:false, isVip:true
+  },
+  {
+    id:15, title:"Goodfellas", genre:"Crime",
+    tags:["Crime","Drama","Biography"],
+    rating:8.7, duration:"2h 26m", price:"R90",
+    poster:"https://image.tmdb.org/t/p/w500/aKuFiU82s5ISJpGZp7YkIr3kCUd.jpg",
+    desc:"The story of Henry Hill and his life in the mob, covering his rise to power and fall from grace.",
+    isNew:false, isVip:false
+  },
+  {
+    id:16, title:"Parasite", genre:"Crime",
+    tags:["Crime","Drama","Thriller"],
+    rating:8.5, duration:"2h 12m", price:"R90",
+    poster:"https://image.tmdb.org/t/p/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg",
+    desc:"Greed and class discrimination threaten the newly formed symbiotic relationship between the wealthy Park family and the destitute Kim clan.",
+    isNew:false, isVip:false
+  },
+
+  /* ── COMEDY ───────────────────────────────── */
+  {
+    id:17, title:"The Hangover", genre:"Comedy",
+    tags:["Comedy","Action"],
+    rating:7.8, duration:"1h 40m", price:"R90",
+    poster:"images/The Hangover.png",
+    desc:"Three buddies wake up from a bachelor party in Las Vegas with no memory of the previous night and the bachelor missing. They must find their friend before his wedding.",
+    isNew:false, isVip:false
+  },
+  {
+    id:18, title:"Superbad", genre:"Comedy",
+    tags:["Comedy"],
+    rating:7.6, duration:"1h 53m", price:"R90",
+    poster:"https://image.tmdb.org/t/p/w500/ek8e8txUyUwd2BNqj6lFEerJfBq.jpg",
+    desc:"Two co-dependent high school seniors are forced to deal with separation anxiety after their plan to stage a booze-fueled party goes awry.",
+    isNew:false, isVip:false
+  },
+  {
+    id:19, title:"Inside Out 2", genre:"Comedy",
+    tags:["Comedy","Animation","Adventure"],
+    rating:7.9, duration:"1h 40m", price:"R90",
+    poster:"https://image.tmdb.org/t/p/w500/vpnVM9B6NMmQpWeZvzLvDESb2QY.jpg",
+    desc:"Follow Riley in her teen years as new emotions join Joy, Sadness, Anger, Fear, and Disgust in Headquarters.",
+    isNew:true, isVip:false
+  },
+
+  /* ── ANIME ────────────────────────────────── */
+  {
+    id:20, title:"Solo Leveling", genre:"Anime",
+    tags:["Anime","Action","Fantasy","Supernatural"],
+    rating:7.6, duration:"2h 49m", price:"R90",
+    poster:"images/Solo Leveling.png",
+    desc:"Follows Sung Jinwoo, a notoriously weak hunter who, after surviving an overwhelmingly powerful dungeon, is chosen by a mysterious System that gives him the rare ability to level up in strength beyond any known limits.",
+    isNew:true, isVip:false
+  },
+  {
+    id:21, title:"Demon Slayer: Kimetsu no Yaiba", genre:"Anime",
+    tags:["Anime","Action","Adventure"],
+    rating:8.6, duration:"2h 55m", price:"R90",
+    poster:"images/demon slayer.png",
+    desc:"A family is attacked by demons and only two members survive — Tanjiro and his sister Nezuko, who is slowly turning into a demon. Tanjiro sets out to become a demon slayer to avenge his family and cure his sister.",
+    isNew:false, isVip:false
+  },
+  {
+    id:22, title:"Spirited Away", genre:"Anime",
+    tags:["Anime","Fantasy","Adventure"],
+    rating:8.6, duration:"2h 5m", price:"R90",
+    poster:"https://image.tmdb.org/t/p/w500/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg",
+    desc:"During her family's move to the suburbs, a sullen 10-year-old girl wanders into a world ruled by gods, witches, and spirits, and where humans are changed into beasts.",
+    isNew:false, isVip:false
+  },
+  {
+    id:23, title:"Your Name", genre:"Anime",
+    tags:["Anime","Romance","Fantasy"],
+    rating:8.4, duration:"1h 46m", price:"R90",
+    poster:"https://image.tmdb.org/t/p/w500/q719jXXEzOoYaps6babgKnONONX.jpg",
+    desc:"Two strangers find themselves linked in a bizarre way. When a connection forms, will distance be the only thing to keep them apart?",
+    isNew:false, isVip:false
+  },
+  {
+    id:24, title:"Jujutsu Kaisen 0", genre:"Anime",
+    tags:["Anime","Action","Fantasy","Supernatural"],
+    rating:7.9, duration:"1h 45m", price:"R90",
+    poster:"https://image.tmdb.org/t/p/w500/23zcblXCMjKdfv78oHBWB8OGRE8.jpg",
+    desc:"Yuta Okkotsu, a nervous high schooler, enrols at a secret high school for Jujutsu Sorcerers to control the immense cursed spirit that has possessed him since childhood.",
+    isNew:false, isVip:false
+  },
+
+  /* ── HORROR ───────────────────────────────── */
+  {
+    id:25, title:"Hereditary", genre:"Horror",
+    tags:["Horror","Thriller","Drama"],
+    rating:7.3, duration:"2h 7m", price:"R90",
+    poster:"https://image.tmdb.org/t/p/w500/mXLOHHc1Zeuwsl4xYKjKh2280oL.jpg",
+    desc:"When the matriarch of the Graham family passes away, her daughter and grandchildren begin to unravel cryptic and terrifying secrets about their ancestry.",
+    isNew:false, isVip:false
+  },
+  {
+    id:26, title:"A Quiet Place", genre:"Horror",
+    tags:["Horror","Sci-Fi","Drama"],
+    rating:7.5, duration:"1h 30m", price:"R90",
+    poster:"https://image.tmdb.org/t/p/w500/nAU74GmpUk7t5iklEp3bufwDq4n.jpg",
+    desc:"In a post-apocalyptic world, a family is forced to live in near silence while hiding from creatures that hunt by sound.",
+    isNew:false, isVip:false
+  },
+  {
+    id:27, title:"Get Out", genre:"Horror",
+    tags:["Horror","Thriller","Drama"],
+    rating:7.7, duration:"1h 44m", price:"R90",
+    poster:"https://image.tmdb.org/t/p/w500/tFXcEccSQMf3lfhfXKSU9iRBpa3.jpg",
+    desc:"A young African-American visits his white girlfriend's parents for the weekend, where his simmering unease about their reception of him eventually reaches a boiling point.",
+    isNew:false, isVip:false
+  },
+
+  /* ── ROMANCE ──────────────────────────────── */
+  {
+    id:28, title:"Titanic", genre:"Romance",
+    tags:["Romance","Drama"],
+    rating:7.9, duration:"3h 14m", price:"R90",
+    poster:"https://image.tmdb.org/t/p/w500/9xjZS2rlVxm8SFx8kPC3aIGCOYQ.jpg",
+    desc:"A seventeen-year-old aristocrat falls in love with a kind but poor artist aboard the luxurious, ill-fated R.M.S. Titanic.",
+    isNew:false, isVip:false
+  },
+  {
+    id:29, title:"La La Land", genre:"Romance",
+    tags:["Romance","Drama","Music"],
+    rating:8.0, duration:"2h 8m", price:"R90",
+    poster:"https://image.tmdb.org/t/p/w500/ylXCdC106IKiarftHkcacasaAcb.jpg",
+    desc:"While navigating their careers in Los Angeles, a pianist and an actress fall in love while attempting to reconcile their aspirations for the future.",
+    isNew:false, isVip:false
+  },
+  {
+    id:30, title:"The Notebook", genre:"Romance",
+    tags:["Romance","Drama"],
+    rating:7.8, duration:"2h 3m", price:"R90",
+    poster:"https://image.tmdb.org/t/p/w500/qom1SZSENdmHFNZBXbtLAGselHK.jpg",
+    desc:"A poor yet passionate young man falls in love with a rich young woman, giving her a sense of freedom, but they are soon separated because of their social differences.",
+    isNew:false, isVip:false
+  },
+
+  /* ── THRILLER ─────────────────────────────── */
+  {
+    id:31, title:"Gone Girl", genre:"Thriller",
+    tags:["Thriller","Drama","Mystery"],
+    rating:8.1, duration:"2h 29m", price:"R90",
+    poster:"https://image.tmdb.org/t/p/w500/fOpDQ3fIy7bN2lUdGqJqzlFb3Ro.jpg",
+    desc:"With his wife's disappearance having become the focus of an intense media circus, a man sees the spotlight turned on him when it's suspected that he may not be innocent.",
+    isNew:false, isVip:false
+  },
+  {
+    id:32, title:"Inception", genre:"Thriller",
+    tags:["Thriller","Sci-Fi","Action"],
+    rating:8.8, duration:"2h 28m", price:"R90",
+    poster:"https://image.tmdb.org/t/p/w500/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg",
+    desc:"A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.",
+    isNew:false, isVip:true
+  },
+  {
+    id:33, title:"Se7en", genre:"Thriller",
+    tags:["Thriller","Crime","Drama"],
+    rating:8.6, duration:"2h 7m", price:"R90",
+    poster:"https://image.tmdb.org/t/p/w500/6yoghtyTpznpBik8EngEmJskVUO.jpg",
+    desc:"Two detectives, a rookie and a veteran, hunt a serial killer who uses the seven deadly sins as his motives.",
+    isNew:false, isVip:false
+  },
+
+  /* ── ADVENTURE ────────────────────────────── */
+  {
+    id:34, title:"Indiana Jones & The Dial of Destiny", genre:"Adventure",
+    tags:["Adventure","Action","Fantasy"],
+    rating:6.5, duration:"2h 34m", price:"R90",
+    poster:"https://image.tmdb.org/t/p/w500/Af4bXE63pVsb2FtbW8uYIyPBadD.jpg",
+    desc:"Archaeologist Indiana Jones races against time to retrieve a legendary dial that can change the course of history. Accompanied by his goddaughter, he soon finds himself squaring off against Jürgen Voller.",
+    isNew:true, isVip:false
+  },
+  {
+    id:35, title:"Avatar: The Way of Water", genre:"Adventure",
+    tags:["Adventure","Sci-Fi","Fantasy"],
+    rating:7.6, duration:"3h 12m", price:"R90",
+    poster:"https://image.tmdb.org/t/p/w500/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg",
+    desc:"Jake Sully lives with his newfound family formed on the planet of Pandora. Once a familiar threat returns to finish what was previously started, Jake must work with Neytiri and the army of the Na'vi race.",
+    isNew:false, isVip:true
+  },
+
+  /* ── WAR ──────────────────────────────────── */
+  {
+    id:36, title:"1917", genre:"War",
+    tags:["War","Drama","Action"],
+    rating:8.2, duration:"1h 59m", price:"R90",
+    poster:"https://image.tmdb.org/t/p/w500/iZf0KyrE25z1sage4SYQLiiC3d8.jpg",
+    desc:"During World War I, two British soldiers are sent to deliver a message to another regiment — a message that could save 1600 men from a deadly ambush.",
+    isNew:false, isVip:false
+  },
+  {
+    id:37, title:"Saving Private Ryan", genre:"War",
+    tags:["War","Drama","Action"],
+    rating:8.6, duration:"2h 49m", price:"R90",
+    poster:"https://image.tmdb.org/t/p/w500/uqx37oZiqAlnckSQNkEQqd38GQY.jpg",
+    desc:"Following the Normandy Landings, a group of U.S. soldiers go behind enemy lines to retrieve a paratrooper whose brothers have been killed in action.",
+    isNew:false, isVip:false
+  },
+
+  /* ── BIOGRAPHY ────────────────────────────── */
+  {
+    id:38, title:"The Pursuit of Happyness", genre:"Biography",
+    tags:["Biography","Drama"],
+    rating:8.0, duration:"1h 57m", price:"R90",
+    poster:"https://image.tmdb.org/t/p/w500/lFCECFRAfbFGrJgDRG4thM7bWBY.jpg",
+    desc:"Based on a true story of Chris Gardner, who went from being homeless and broke to becoming a successful stockbroker and millionaire.",
+    isNew:false, isVip:false
+  },
+  {
+    id:39, title:"Bohemian Rhapsody", genre:"Biography",
+    tags:["Biography","Drama","Music"],
+    rating:7.9, duration:"2h 14m", price:"R90",
+    poster:"https://image.tmdb.org/t/p/w500/lHu1wtNaczFPGFDTrjCSzeLPTKN.jpg",
+    desc:"The story of the legendary rock band Queen and lead singer Freddie Mercury, leading up to their famous performance at Live Aid in 1985.",
+    isNew:false, isVip:false
+  },
+];
+
+// ══════════════════════════════════════════════
+//  GENRE CONFIG — icon + display order
+// ══════════════════════════════════════════════
+const GENRE_CONFIG = [
+  { key:"Sci-Fi",     icon:"🚀", label:"SCI-FI" },
+  { key:"Action",     icon:"⚔️",  label:"ACTION" },
+  { key:"Drama",      icon:"🎭", label:"DRAMA" },
+  { key:"Crime",      icon:"🕵️", label:"CRIME" },
+  { key:"Comedy",     icon:"😂", label:"COMEDY" },
+  { key:"Anime",      icon:"⛩️", label:"ANIME" },
+  { key:"Horror",     icon:"👻", label:"HORROR" },
+  { key:"Romance",    icon:"❤️",  label:"ROMANCE" },
+  { key:"Thriller",   icon:"🔪", label:"THRILLER" },
+  { key:"Adventure",  icon:"🗺️", label:"ADVENTURE" },
+  { key:"War",        icon:"🪖", label:"WAR" },
+  { key:"Biography",  icon:"📖", label:"BIOGRAPHY" },
+];
+
+// ── STATE ──
+let activeGenre = 'All';
+let searchTerm  = '';
+let sortMode    = 'default';
+
+// ── BUILD CARD ──
+function buildCard(m) {
+  const fallback = `https://placehold.co/300x450/141419/e50914?text=${encodeURIComponent(m.title)}`;
+  return `
+  <div class="mc" onclick="goBook('${encodeURIComponent(m.title)}')">
+    <div class="mc-poster">
+      <img src="${m.poster}" alt="${m.title}" loading="lazy"
+           onerror="this.src='${fallback}'">
+      ${m.isNew ? '<span class="mc-badge badge-new">NEW</span>' : ''}
+      ${m.isVip ? '<span class="mc-badge badge-vip">VIP</span>' : ''}
+      <span class="mc-rating"><i class="fa-solid fa-star" style="font-size:.65rem;color:var(--gold)"></i> ${m.rating}</span>
+      <div class="mc-overlay">
+        <div class="ov-title">${m.title}</div>
+        <div class="ov-desc">${m.desc}</div>
+        <div class="ov-actions" onclick="event.stopPropagation()">
+          <button class="ov-book" onclick="goBook('${encodeURIComponent(m.title)}')"><i class="fa-solid fa-ticket"></i> Book</button>
+          <button class="ov-trailer" onclick="searchTrailer('${encodeURIComponent(m.title)}')"><i class="fa-solid fa-play"></i> Trailer</button>
+        </div>
+      </div>
+    </div>
+    <div class="mc-body">
+      <div class="mc-title">${m.title}</div>
+      <div class="mc-genre">${m.tags.join(' · ')}</div>
+      <div class="mc-meta">
+        <span>${m.duration}</span>
+        <span class="dot"></span>
+        <span style="color:var(--gold)">★ ${m.rating}</span>
+      </div>
+    </div>
+    <div class="mc-footer">
+      <span class="mc-price">${m.price}</span>
+      <button class="mc-bookbtn" onclick="event.stopPropagation();goBook('${encodeURIComponent(m.title)}')">Book</button>
+    </div>
+  </div>`;
+}
+
+// ── SORT ──
+function sortMovies(list) {
+  const s = [...list];
+  if (sortMode === 'rating')    return s.sort((a,b) => b.rating - a.rating);
+  if (sortMode === 'name')      return s.sort((a,b) => a.title.localeCompare(b.title));
+  if (sortMode === 'price-low') return s.sort((a,b) => parseInt(a.price) - parseInt(b.price));
+  if (sortMode === 'duration')  return s.sort((a,b) => parseDur(b.duration) - parseDur(a.duration));
+  return s;
+}
+function parseDur(d) {
+  const m = d.match(/(\d+)h\s*(\d+)?m?/);
+  return m ? parseInt(m[1]||0)*60 + parseInt(m[2]||0) : 0;
+}
+
+// ── FILTER + RENDER ──
+function applyFilters() {
+  searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+  sortMode   = document.getElementById('sortSelect').value;
+  renderAll();
+}
+function filterGenre(genre, btn) {
+  activeGenre = genre;
+  document.querySelectorAll('.gpill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  renderAll();
+}
+
+function renderAll() {
+  const sections = document.getElementById('movieSections');
+  const noRes    = document.getElementById('noResults');
+  let totalShown = 0;
+
+  // Filter by search
+  const filtered = ALL_MOVIES.filter(m => {
+    const matchSearch = !searchTerm ||
+      m.title.toLowerCase().includes(searchTerm) ||
+      m.tags.some(t => t.toLowerCase().includes(searchTerm)) ||
+      m.desc.toLowerCase().includes(searchTerm);
+    const matchGenre = activeGenre === 'All' || m.genre === activeGenre;
+    return matchSearch && matchGenre;
+  });
+
+  totalShown = filtered.length;
+  document.getElementById('statTotal').textContent = totalShown;
+
+  if (!totalShown) {
+    sections.innerHTML = '';
+    noRes.style.display = 'block';
+    return;
+  }
+  noRes.style.display = 'none';
+
+  // Group by genre in defined order
+  const genresToShow = activeGenre === 'All'
+    ? GENRE_CONFIG
+    : GENRE_CONFIG.filter(g => g.key === activeGenre);
+
+  let html = '';
+  let genreCount = 0;
+
+  genresToShow.forEach(gc => {
+    const movies = sortMovies(filtered.filter(m => m.genre === gc.key));
+    if (!movies.length) return;
+    genreCount++;
+    html += `
+    <section class="genre-section" id="gs-${gc.key}">
+      <div class="genre-header">
+        <span class="genre-icon">${gc.icon}</span>
+        <h2>${gc.label}</h2>
+        <span class="genre-count">${movies.length} film${movies.length>1?'s':''}</span>
+      </div>
+      <div class="movie-grid">
+        ${movies.map(m => buildCard(m)).join('')}
+      </div>
+    </section>`;
+  });
+
+  sections.innerHTML = html || '<div class="no-results"><i class="fa-solid fa-film"></i><h3>NO MOVIES FOUND</h3></div>';
+  document.getElementById('statGenres').textContent = genreCount;
+}
+
+// ── ACTIONS ──
+function goBook(title) {
+  window.location.href = 'booking.html?movie=' + title;
+}
+function searchTrailer(title) {
+  window.open('https://www.youtube.com/results?search_query=' + title + '+official+trailer', '_blank');
+}
+
+// ── BACK TO TOP ──
+window.addEventListener('scroll', () => {
+  document.getElementById('btt').classList.toggle('show', scrollY > 400);
+});
+
+// ── INIT ──
+renderAll();
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
